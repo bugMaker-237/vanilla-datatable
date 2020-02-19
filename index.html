@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Vanilla Datatable</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="style.css" rel="stylesheet" />
+  </head>
+  <body>
+    <table>
+      <thead>
+        <tr>
+          <th>Nom</th>
+          <th>Prenom</th>
+          <th>Poste</th>
+          <th>Age</th>
+        </tr>
+      </thead>
+      <thead>
+        <tr>
+          <th>
+            <input type="text" vm-filter="nom" placeholder="Nom" />
+          </th>
+          <th>
+            <input type="text" vm-filter="prenom" placeholder="Prenom" />
+          </th>
+          <th>
+            <input type="text" vm-filter="poste" placeholder="Poste" />
+          </th>
+          <th>
+            <input type="text" vm-filter="age" placeholder="Age" />
+          </th>
+        </tr>
+      </thead>
+      <tbody srcEntry></tbody>
+    </table>
+
+    <script src="./index.js"></script>
+    <script src="./data-table.js"></script>
+  </body>
+</html>
