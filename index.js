@@ -3,18 +3,8 @@ var app = {
     document.addEventListener("DOMContentLoaded", event => {
       // this.load(getDataSource(Context));
       this.setFilters(Context);
-      this.linkPagination();
       
     });
-  },
-  linkPagination: function(){
-    document.querySelectorAll('[vm-page]').forEach(function (elt) {
-      elt.addEventListener('click', function (event) {
-        event.stopImmediatePropagation();
-        var page = event.target.getAttribute('vm-page');
-        this.tableFilter.paginate(page);
-      }.bind({tableFilter: this.tableFilter}))
-    }.bind(this));
   },
   load: function(dataSource) {
     dataSource = dataSource || getDataSource();
