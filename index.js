@@ -1,11 +1,23 @@
 var app = {
   init: function(Context) {
     document.addEventListener("DOMContentLoaded", event => {
-      this.load(this.getDataSource(Context));
+      // this.load(getDataSource(Context));
       this.setFilters(Context);
+      this.linkPagination();
+      
     });
   },
+  linkPagination: function(){
+    document.querySelectorAll('[vm-page]').forEach(function (elt) {
+      elt.addEventListener('click', function (event) {
+        event.stopImmediatePropagation();
+        var page = event.target.getAttribute('vm-page');
+        this.tableFilter.paginate(page);
+      }.bind({tableFilter: this.tableFilter}))
+    }.bind(this));
+  },
   load: function(dataSource) {
+    dataSource = dataSource || getDataSource();
     var table = document.querySelector("[srcEntry]");
     table.innerHTML = "";
     var headers = ["nom", "prenom", "poste", "age"];
@@ -22,18 +34,56 @@ var app = {
       table.appendChild(childElement);
     });
   },
-  getDataSource: function(Context) {
-    return Context.dataSource;
+  deferredLoader: function (inputValueMap) {
+    
+    return new Promise((resolver)=>{
+      setTimeout(function () {
+        //Pretending to be going to the server to do some stuff
+        var dataSource = getDataSource();
+        var finalArray = [];
+        for (var i = 0; i < dataSource.length; i++) {
+          const d = dataSource[i];
+          var canBePushed = undefined; // <- if not set explicitly the value will be reduced after next iteration since variable is not scoped
+          for (var j = 0; j < inputValueMap.length; j++) {
+            const inputFilter = inputValueMap[j].filter;
+            const inputValue = inputValueMap[j].value;
+            if (inputValue == null || inputValue.trim() == "") continue;
+    
+            var res =
+              d[inputFilter]
+                .toString()
+                .toLowerCase()
+                .indexOf(inputValue.toLowerCase()) > -1;
+    
+            canBePushed =
+              typeof canBePushed !== "undefined" ? canBePushed && res : res;
+    
+            if (!canBePushed) break;
+          }
+          if (canBePushed) finalArray.push(d);
+        }
+        console.log(finalArray);
+        resolver(finalArray);
+      }.bind({resolver:resolver}), 1000);
+    })
   },
   setFilters: function(Context) {
-    var multiSearch = new MultiSearch({
-      dataSource: this.getDataSource(Context),
+    this.tableFilter = new DataTableFilter({
+      dataSource: getDataSource(Context),
       filterSelector: "[vm-filter]",
-      dataSourceLoader: this.load
+      paginatorSelector: "[vm-page]",
+      dataSourceLoader: this.load,
+      itemsPerPage: 20,
+      hasPagination: true,
+      isDeferred:true,
+      deferredQueryLoader: this.deferredLoader
     });
+    this.tableFilter.fillDataTable();
   }
 };
-
+function getDataSource(Context = window) {
+  return Context.dataSource;
+}
 window.dataSource = [
   {
     "_id": "5e4d913c9477dea91f180b29",
